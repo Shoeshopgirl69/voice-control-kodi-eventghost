@@ -1,4 +1,5 @@
-# Voice Control for Kodi
+# Voice Control for Kodi using EventGhost
+# This is not ready yet - this readme is just a place holder
 ## Requirements:
 - Google Home
 - IFTTT account linked to your Google Home
