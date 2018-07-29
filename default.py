@@ -6,21 +6,21 @@ import re
 
 # Replace with your file server IP Address
 # Your file server host your movies and TV shows
-networkShareIp = str('10.178.100.1')
+networkShareIp = str('0.0.0.0')
 shareName = 'movies'
 payload = eg.event.payload[0]
 print eg.event.payload[0].strip()
 
 # Assigning a default player if no player is specified
 print "Payload before: " + str(payload)
-player = '10.178.88.174:8080'
+player = '0.0.0.0:8080'
 
 # Stripping out player if player is specified
 if re.search('in the bedroom', payload):
-    player = '10.178.0.118:8080'
+    player = '0.0.0.0:8080'
     payload = payload.replace(' in the bedroom', '')
 if re.search('in the living room', payload):
-    player = '10.178.88.174:8080'
+    player = '0.0.0.0:8080'
     payload = payload.replace(' in the living room', '')
 print "Payload after location striped out: " + str(payload)
 
@@ -43,7 +43,7 @@ print "Breakdown: " + str(breakdown)
 print "Command: " + str(command)
 
 #TheMovieDB API Key; replace with your API key if you have one
-apikey = '157ab3cbdf2b143cbf07caab87c6a5ba'
+apikey = ''
 
 def getPlayerID ():
     url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"Player.GetActivePlayers","id":1}'
@@ -295,7 +295,7 @@ def downloadMovie(payload):
         url = 'http://10.178.0.118:7878/api/movie'
         req = urllib2.Request(url)
         req.add_header('Content-Type','application/json')
-        req.add_header('X-Api-Key', '4e1b73ddefa84185acfce6d261ed3790')
+        req.add_header('X-Api-Key', '')
         urllib2.urlopen(req,data)
     except Exception as e:
         print 'Error (Radarr): ', sys.exc_info()
