@@ -52,7 +52,7 @@ class Serv(BaseHTTPRequestHandler):
     def downloadMovie(self, title):
         try:
             print("Seeing if movie exists and sanitizing text")
-            url = 'http://10.178.0.118:7878/api/movie/lookup?term=' + title.strip('%20') + '&apikey=4e1b73ddefa84185acfce6d261ed3790'
+            url = 'http://x.x.x.x:7878/api/movie/lookup?term=' + title.strip('%20') + '&apikey=theapikey'
             req = urllib.request.Request(url)
             req.add_header('Content-Type','application/json')
             response = urllib.request.urlopen(req)
@@ -72,7 +72,7 @@ class Serv(BaseHTTPRequestHandler):
                     # Get current Radarr data
                     entryExist = bool(0)
                     print("Looking to see if the movie is already in Radarr")
-                    url = 'http://10.178.0.118:7878/api/movie?apikey=4e1b73ddefa84185acfce6d261ed3790'
+                    url = 'http://x.x.x.x:7878/api/movie?apikey=theapikey'
                     req = urllib.request.Request(url)
                     req.add_header('Content-Type','application/json')
                     response = urllib.request.urlopen(req)
@@ -84,8 +84,8 @@ class Serv(BaseHTTPRequestHandler):
                             print('Movie is already in Radarr')
 
                     if not entryExist:
-                        data = '{"qualityProfileID":"4","monitored":"true","rootFolderPath":"\\\\\\\\10.178.100.1\\\\Movies","title":"' + movieTitle + '","images":[{"covertype":"poster","url":"' + imagePath + '"}],"titleslug":"' + titleBlob + '","tmdbId":"' + str(tmdbId) + '"}'
-                        url = 'http://10.178.0.118:7878/api/movie?apikey=4e1b73ddefa84185acfce6d261ed3790'
+                        data = '{"qualityProfileID":"4","monitored":"true","rootFolderPath":"\\\\\\\\x.x.x.x\\\\Movies","title":"' + movieTitle + '","images":[{"covertype":"poster","url":"' + imagePath + '"}],"titleslug":"' + titleBlob + '","tmdbId":"' + str(tmdbId) + '"}'
+                        url = 'http://x.x.x.x:7878/api/movie?apikey=theapikey'
                         params = bytes(data.encode())
                         req = urllib.request.Request(url)
                         req.add_header('Content-Type','application/json')
@@ -106,7 +106,7 @@ class Serv(BaseHTTPRequestHandler):
         
         return
 
-httpd = HTTPServer(('10.178.0.118', 34567), Serv)
+httpd = HTTPServer(('x.x.xx', 34567), Serv)
 print(time.asctime(), "Server Starts - %s:%s" % ('localhost', '34567'))
 try:
     httpd.serve_forever()
