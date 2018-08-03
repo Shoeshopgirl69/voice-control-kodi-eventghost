@@ -7,9 +7,11 @@ import json
 import sys
 import re
 
-apikey = '' # Radarr API key
+serverIP = '0.0.0.0' # IP of machine running this script
+portNumber = '34567' # Port number this script should open
+apikey = '0.0.0.0' # Radarr API key
 RadarrIP = '0.0.0.0:7878' # Radarr IP and port number
-mediaPath = '\\\\\\\\0.0.0.0\\\\Movies' # Path supplied to Radarr to move movie; supplying and example for SMB
+mediaPath = '\\\\\\\\0.0.0.0\\\\Movies' # Path supplied to Radarr to move movie; you might need to change the format for local disk
 player = '0.0.0.0:8080' # Kodi IP and port number
 
 class Serv(BaseHTTPRequestHandler):
@@ -175,12 +177,12 @@ class Serv(BaseHTTPRequestHandler):
                     
         return
 
-httpd = HTTPServer(('10.178.0.118', 34567), Serv)
-print(time.asctime(), "Server Starts - %s:%s" % ('localhost', '34567'))
+httpd = HTTPServer((serverIP, 34567), Serv)
+print(time.asctime(), "Server Starts - %s:%s" % ('localhost', portNumber))
 try:
     httpd.serve_forever()
 except KeyboardInterrupt:
     pass
 	
 httpd.server_close()
-print(time.asctime(), "Server Stops - %s:%s" % ('localhost', '34567'))
+print(time.asctime(), "Server Stops - %s:%s" % ('localhost', portNumber))
