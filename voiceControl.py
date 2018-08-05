@@ -66,8 +66,9 @@ class Serv(BaseHTTPRequestHandler):
             req.add_header('Content-Type','application/json')
             response = urllib.request.urlopen(req)
             jsondata = json.loads(response.read().decode('utf-8'))
-            print(jsondata[0])
+
             if len(jsondata) != 0:
+		print(jsondata[0])
                 print(jsondata[0]['title'])
                 movieTitle = jsondata[0]['title']
                 print(movieTitle)
