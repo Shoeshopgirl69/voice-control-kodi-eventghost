@@ -7,12 +7,12 @@ import json
 import sys
 import re
 
-serverIP = '10.178.0.118' # IP of machine running this script
-portNumber = '34567' # Port number this script should open
-apikey = '4e1b73ddefa84185acfce6d261ed3790' # Radarr API key
-RadarrIP = '10.178.0.118:7878' # Radarr IP and port number
-mediaPath = '\\\\\\\\10.178.100.1\\\\Movies' # Path supplied to Radarr to move movie
-player = '10.178.88.174:8080' # Kodi IP and port number
+serverIP = 'Replace' # IP of machine running this script
+portNumber = 'Replace' # Port number this script should open
+apikey = 'Replace' # Radarr API key
+RadarrIP = 'Replace:Replace' # Radarr IP and port number
+mediaPath = '\\\\\\\\Replace\\\\Movies' # Path supplied to Radarr to move movie
+player = 'Replace:Replace' # Kodi IP and port number
 
 class Serv(BaseHTTPRequestHandler):
 
