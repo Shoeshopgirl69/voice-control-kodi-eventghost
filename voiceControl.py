@@ -7,12 +7,12 @@ import json
 import sys
 import re
 
-serverIP = '0.0.0.0' # IP of machine running this script
+serverIP = '10.178.0.118' # IP of machine running this script
 portNumber = '34567' # Port number this script should open
-apikey = '0.0.0.0' # Radarr API key
-RadarrIP = '0.0.0.0:7878' # Radarr IP and port number
-mediaPath = '\\\\\\\\0.0.0.0\\\\Movies' # Path supplied to Radarr to move movie; you might need to change the format for local disk
-player = '0.0.0.0:8080' # Kodi IP and port number
+apikey = '4e1b73ddefa84185acfce6d261ed3790' # Radarr API key
+RadarrIP = '10.178.0.118:7878' # Radarr IP and port number
+mediaPath = '\\\\\\\\10.178.100.1\\\\Movies' # Path supplied to Radarr to move movie
+player = '10.178.88.174:8080' # Kodi IP and port number
 
 class Serv(BaseHTTPRequestHandler):
 
@@ -24,6 +24,7 @@ class Serv(BaseHTTPRequestHandler):
     def do_GET(self):
         self._set_headers()  
         if "/Phrase?" in self.path:
+            print("Client IP Address: " + str(self.client_address[0]) + ":" + str(self.client_address[1]))
             preurl, text = self.path.split("?")
             # print("This is what I received: " + text)
             redir = "<html><head><title>Voice Control</title></head><body><h1>Message Received: "+text+"</h1></body></html>"
@@ -45,6 +46,15 @@ class Serv(BaseHTTPRequestHandler):
         self._set_headers()
         self.wfile.write("<html><body><h1>I don't POST on the first date.</h1></body></html>".encode())
 
+    def getPlayerID(self):
+        url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"Player.GetActivePlayers","id":1}'
+        req = urllib.request.Request(url)
+        response = urllib.request.urlopen(req)
+        jsondata = json.loads(response.read())
+        print(jsondata)
+        playerID = jsondata['result'][0]['playerid']
+        return playerID
+
     def phrase(self, text):
         #print(text)
         command = text.replace('%20',' ').lower().split(' ',1)[0]
@@ -53,22 +63,48 @@ class Serv(BaseHTTPRequestHandler):
         print(title)
         if command == 'download':
             self.downloadMovie(str(title))
-        if command == 'play':
+        elif command == 'play':
             self.playMovie(str(title))
+        elif command == 'scan':
+            url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"VideoLibrary.Scan","id":1}'
+            req = urllib.request.Request(url)
+            response = urllib.request.urlopen(req)
+        elif command == 'clean':
+            url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"VideoLibrary.Clean","id":1}'
+            req = urllib.request.Request(url)
+            response = urllib.request.urlopen(req)
+        elif command == 'exit':
+            url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"Application.Quit","id":1}'
+            req = urllib.request.Request(url)
+            response = urllib.request.urlopen(req)
+        elif command == 'pause' or command == 'resume' or command == 'Paws':
+            playerID = str(self.getPlayerID())
+            url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"Player.PlayPause","params":{"playerid":' + playerID + '},"id":1}'
+            req = urllib.request.Request(url)
+            response = urllib.request.urlopen(req)
+        elif command == 'stop':
+            playerID = str(self.getPlayerID())
+            url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"Player.Stop","params":{ "playerid": ' + playerID + '},"id":1}'
+            req = urllib.request.Request(url)
+            response = urllib.request.urlopen(req)
+        else:
+            print("Whacha' talking about Willis")
+
         return
 
     def downloadMovie(self, title):
         try:
             print("Seeing if movie exists and sanitizing text")
-            url = 'http://' + RadarrIP + '/api/movie/lookup?term=' + title.strip('%20') + '&apikey=' + apikey
+            print(title)
+            url = 'http://' + RadarrIP + '/api/movie/lookup?term=' + title + '&apikey=' + apikey
             print(url)
             req = urllib.request.Request(url)
             req.add_header('Content-Type','application/json')
             response = urllib.request.urlopen(req)
             jsondata = json.loads(response.read().decode('utf-8'))
-
+            
             if len(jsondata) != 0:
-		print(jsondata[0])
+                print(jsondata[0])
                 print(jsondata[0]['title'])
                 movieTitle = jsondata[0]['title']
                 print(movieTitle)
@@ -115,19 +151,10 @@ class Serv(BaseHTTPRequestHandler):
 
         return
 
-    def getPlayerID ():
-        url = 'http://' + player + '/jsonrpc?request={"jsonrpc":"2.0","method":"Player.GetActivePlayers","id":1}'
-        req = urllib2.Request(url)
-        response = urllib2.urlopen(req)
-        jsondata = json.loads(response.read())
-        print(jsondata)
-        playerID = jsondata['result'][0]['playerid']
-        return playerID
-
     def playMovie(self, title):
         try:
             print("Seeing if movie exists and sanitizing text")
-            url = 'http://' + RadarrIP + '/api/movie/lookup?term=' + title.strip('%20') + '&apikey=' + apikey
+            url = 'http://' + RadarrIP + '/api/movie/lookup?term=' + title + '&apikey=' + apikey
             print(url)
             req = urllib.request.Request(url)
             req.add_header('Content-Type','application/json')
@@ -161,6 +188,7 @@ class Serv(BaseHTTPRequestHandler):
 
                 movieid = str(jsondata['result']['movies'][0]['movieid'])
                 print(movieid)
+                
                 try:
                     url = 'http://' + player + '/jsonrpc?request={"id":1,"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"movieid":' + movieid + '},"options":{"resume":true}}}'
                     req = urllib.request.Request(url)
